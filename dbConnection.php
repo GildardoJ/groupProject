@@ -1,5 +1,5 @@
 <?php
-function getDatabaseConnection($lab5){
+function getDatabaseConnection($team_project){
     
     $host = 'localhost';//cloud 9
     $dbname = $teamProject;
