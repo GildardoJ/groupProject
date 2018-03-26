@@ -65,7 +65,7 @@ function displayBanks(){
     $stmt->execute($namedParameters);
     $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
      foreach ($records as $record) {
-        echo  "<p><a href='#' onclick='dosomething(); return(false);'>". "<b>Bank Name: </b>" . "</a>" .$record['deptName'] . " <b>Dept Type:</b> " . $record['bankType'] . " <br/><b>Id:</b> " . $record['departmentId'] .  
+        echo  "<p><a href='#' onclick='dosomething(); return(false);'>". "<b>Bank Name: </b>" . "</a>" .$record['deptName'] . " <b>Dept Type:</b> " . $record['bankType'] . " <br/><br></br><b>Id:</b> " . $record['departmentId'] .  
              // "  <b>Status:</b> " . $record['bankType'] .
                "</p><a target='checkoutHistory' href='checkoutHistory.php?deviceId=".$record['bankType']."'> ADD </a><br />";
     }
