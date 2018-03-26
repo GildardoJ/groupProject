@@ -1,9 +1,9 @@
 <?php
-function getDatabaseConnection($groupProject){
+function getDatabaseConnection($groupProject = "groupProject"){
     
     $host = 'localhost';//cloud 9
     $dbname = $groupProject;
-    $username = 'gautamtata';
+    $username = 'gorozco';
     $password = '';
     
     //using different database variables in Heroku
@@ -20,6 +20,7 @@ function getDatabaseConnection($groupProject){
     
     //display errors when accessing tables
     $dbConn -> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    
     return $dbConn;
     
 }

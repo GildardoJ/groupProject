@@ -1,18 +1,23 @@
 <?php
 include 'dbConnection.php';
-$conn = getDatabaseConnection();
+$conn = getDatabaseConnection("groupProject");
+
 function getBankTypes() {
     global $conn;
-    $sql = "SELECT DISTINCT(department)
-            FROM `bankType`
-            ORDER BY department";
+    $sql = "SELECT DISTINCT(bankType)
+            FROM `department`
+            ORDER BY bankType";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
-    $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $records = $stmt->fetchALL(PDO::FETCH_ASSOC);
+    
+    //print_r $records;
+    
     foreach ($records as $record) {
         echo "<option> "  . $record['bankType'] . "</option>";
     }
 }
+
 function displayBanks(){
     global $conn;
     $sql = "SELECT * FROM department WHERE 1";
@@ -66,7 +71,7 @@ function displayBanks(){
         <title>Team Project: Bank Search </title>
         <meta charset="utf-8">
         <style>
-               @import url('css/styles.css');
+               @import url('styles.css');
         </style>
     </head>
     <body>
@@ -75,11 +80,16 @@ function displayBanks(){
         </header>
 
         <form>
-             Device: <input type="text" name="bankType" placeholder="Bank Name"/>
+             Bank: <input type="text" name="bankType" placeholder="Bank Name"/>
             Type:
             <select name="bankType">
                 <option value="">Select One</option>
-                <?=getBankTypes()?>
+                
+                <?php
+                echo " before getBankTypes()";
+                getBankTypes();
+                echo " after getBankTypes()";
+                ?>
             </select>
 
              <input type="checkbox" name="available" id="available" value="A">
