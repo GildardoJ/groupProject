@@ -1,7 +1,6 @@
 <?php
 include 'dbConnection.php';
 $conn = getDatabaseConnection('groupProject');
-
 function getBankTypes() {
     global $conn;
      $sql = "SELECT DISTINCT(bankType)
@@ -43,12 +42,13 @@ function displayBanks(){
              $sql .= " AND status = :status";
              $namedParameters[':status'] =  $_GET['available'];
          }
+          if(isset($_GET['orderBy']) && $_GET['orderBy'] == 'ID'){
+                  $sql .= " ORDER BY departmentId";
+         }
          if(isset($_GET['orderBy']) && $_GET['orderBy'] == 'name')     {
                   $sql .= " ORDER BY deptName";
         } 
-         else if(isset($_GET['orderBy']) && $_GET['orderBy'] == 'ID'){
-                  $sql .= " ORDER BY departmetId";
-        }
+        
     //endIf (isset)
       else  {
         $sql .= " ORDER BY bankType";
@@ -62,7 +62,7 @@ function displayBanks(){
     $stmt->execute($namedParameters);
     $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
      foreach ($records as $record) {
-        echo  "<p><b>Bank Name: </b> ".$record['bankType'] . " <b>Dept Type:</b> " . $record['deptName'] . " <br/><b>Id:</b> " . $record['departmentId'] .  
+        echo  "<p><b>Bank Name: </b> ".$record['deptName'] . " <b>Dept Type:</b> " . $record['bankType'] . " <br/><b>Id:</b> " . $record['departmentId'] .  
              // "  <b>Status:</b> " . $record['bankType'] .
                "</p><a target='checkoutHistory' href='checkoutHistory.php?deviceId=".$record['bankType']."'> Checkout History </a><br />";
     }
@@ -93,8 +93,8 @@ function displayBanks(){
                 ?>
             </select>
 
-             <input type="checkbox" name="available" id="available" value="A">
-            <label for="available"> Available </label>
+            <!-- <input type="checkbox" name="available" id="available" value="A">-->
+            <!--<label for="available"> Available </label>-->
 
             <br>
             Order by:
