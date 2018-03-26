@@ -37,22 +37,24 @@ function displayBanks(){
             $namedParameters[':dType'] =   $_GET['bankType'] ;
          }
          
-         if (isset($_GET['available'])) {
-             echo $_GET['status'];
-             $sql .= " AND status = :status";
-             $namedParameters[':status'] =  $_GET['available'];
-         }
+        //  if (isset($_GET['available'])) {
+        //      echo $_GET['status'];
+        //      $sql .= " AND status = :status";
+        //      $namedParameters[':status'] =  $_GET['available'];
+        //  }
           if(isset($_GET['orderBy']) && $_GET['orderBy'] == 'ID'){
                   $sql .= " ORDER BY departmentId";
          }
          if(isset($_GET['orderBy']) && $_GET['orderBy'] == 'name')     {
                   $sql .= " ORDER BY deptName";
         } 
-        
+         if(isset($_GET['orderBy']) && $_GET['orderBy'] == 'type')     {
+                  $sql .= " ORDER BY bankType";
+        } 
     //endIf (isset)
-      else  {
-        $sql .= " ORDER BY bankType";
-    }
+    //   else  {
+    //     $sql .= " ORDER BY bankType";
+    // }
      //echo "<br/>". $sql;
     //If user types a bankType
      //   "AND bankType LIKE '%$_GET['bankType']%'";
