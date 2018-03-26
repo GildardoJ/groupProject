@@ -52,6 +52,7 @@ function displayBanks(){
                   $sql .= " ORDER BY bankType";
         } 
     //endIf (isset)
+    
     //   else  {
     //     $sql .= " ORDER BY bankType";
     // }
@@ -64,9 +65,9 @@ function displayBanks(){
     $stmt->execute($namedParameters);
     $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
      foreach ($records as $record) {
-        echo  "<p><b>Bank Name: </b> ".$record['deptName'] . " <b>Dept Type:</b> " . $record['bankType'] . " <br/><b>Id:</b> " . $record['departmentId'] .  
+        echo  "<p><a href='#' onclick='dosomething(); return(false);'>". "<b>Bank Name: </b>" . "</a>" .$record['deptName'] . " <b>Dept Type:</b> " . $record['bankType'] . " <br/><b>Id:</b> " . $record['departmentId'] .  
              // "  <b>Status:</b> " . $record['bankType'] .
-               "</p><a target='checkoutHistory' href='checkoutHistory.php?deviceId=".$record['bankType']."'> Checkout History </a><br />";
+               "</p><a target='checkoutHistory' href='checkoutHistory.php?deviceId=".$record['bankType']."'> ADD </a><br />";
     }
 }
 ?>
@@ -77,7 +78,7 @@ function displayBanks(){
         <title>Team Project: Bank Search </title>
         <meta charset="utf-8">
         <style>
-               /*@import url('css/styles.css');*/
+               @import url('css/styles.css');
         </style>
     </head>
     <body>
