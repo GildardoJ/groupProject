@@ -24,33 +24,44 @@ function displayBanks(){
     global $conn;
     $sql = "SELECT * FROM department WHERE 1";
     if (isset($_GET['submit'])){
-        $namedParameters = array();
-        if (!empty($_GET['departmentId'])) {
+         $namedParameters = array();
+         if (!empty($_GET['departmentId'])) {
+            $sql .= " AND departmentId = :deptId"; //using named parameters
+            $namedParameters[':deptId'] = "%" . $_GET['departmentId'] . "%";  
+         }
+         if (!empty($_GET['deptName'])) {
             //The following query allows SQL injection due to the single quotes
             //$sql .= " AND bankType LIKE '%" . $_GET['bankType'] . "%'";
-            $sql .= " AND departmentId LIKE :departmentId"; //using named parameters
-            $namedParameters[':bankType'] = "%" . $_GET['bankType'] . "%";
+            $sql .= " AND deptName LIKE :deptName"; //using named parameters
+            $namedParameters[':deptName'] = "%" . $_GET['deptName'] . "%";
          }
+    }
          if (!empty($_GET['bankType'])) {
             //The following query allows SQL injection due to the single quotes
             //$sql .= " AND bankType LIKE '%" . $_GET['bankType'] . "%'";
             $sql .= " AND bankType = :dType"; //using named parameters
             $namedParameters[':dType'] =   $_GET['bankType'] ;
          }
-         if (isset($_GET['available'])) {
-             echo $_GET['status'];
-             $sql .= " AND status = :status";
-             $namedParameters[':status'] =  $_GET['available'];
+         
+        //  if (isset($_GET['available'])) {
+        //      echo $_GET['status'];
+        //      $sql .= " AND status = :status";
+        //      $namedParameters[':status'] =  $_GET['available'];
+        //  }
+          if(isset($_GET['orderBy']) && $_GET['orderBy'] == 'ID'){
+                  $sql .= " ORDER BY departmentId";
          }
          if(isset($_GET['orderBy']) && $_GET['orderBy'] == 'name')     {
                   $sql .= " ORDER BY deptName";
-        } else if(isset($_GET['orderBy']) && $_GET['orderBy'] == 'ID'){
-                  $sql .= " ORDER BY departmetId";
-        }
-    }//endIf (isset)
-      else  {
-        $sql .= " ORDER BY bankType";
-    }
+        } 
+         if(isset($_GET['orderBy']) && $_GET['orderBy'] == 'type')     {
+                  $sql .= " ORDER BY bankType";
+        } 
+    //endIf (isset)
+    
+    //   else  {
+    //     $sql .= " ORDER BY bankType";
+    // }
      //echo "<br/>". $sql;
     //If user types a bankType
      //   "AND bankType LIKE '%$_GET['bankType']%'";
@@ -66,9 +77,7 @@ function displayBanks(){
              "</p><a target='' href='addCart.php?addCart=".$record['departmentId']."'> Add to cart </a><br />";
             
      }
-     
-   
-     
+    
 }
 
 function showCart(){
@@ -107,44 +116,42 @@ function showCart(){
         <h1>Banking Systems</h1>
         </header>
             <div >
-            <form>
-                 Member: <input type="text" name="userId" placeholder="Member?"/>
-                Type:
-                <select name="bankType">
-                    <option value="">Select One</option>
-                    <?php
-                    getBankTypes();
-                    ?>
-                </select>
-    
-                <input type="checkbox" name="available" id="available" value="A">
-                <label for="available"> Available </label>
-    
-                <br>
-                Order by:
-                <input type="radio" name="orderBy" id="orderByName" value="name">
-                <label for="orderByName"> Name </label>
-    
-                <input type="radio" name="orderBy" id="orderByPrice" value="price">
-                <label for="orderByPrice"> Price </label>
-    
-    
-    
-                <input type="submit" value="Search!" name="submit" >
-            </form>
-            <form action = "reset.php" method = "post">
-                    Clear Cart <input type= "Submit">
-            </form>
+
+        <form>
+            Bank: <input type="text" name="bankType" placeholder="Bank Name"/>
+            Type:
+            <select name="bankType" id ="department">
+                <option value="">Select One</option>
+                <?php
+                    getBankTypes()
+                ?>
+            </select>
+
+            <!-- <input type="checkbox" name="available" id="available" value="A">-->
+            <!--<label for="available"> Available </label>-->
+
+            <br>
+            Order by:
+            <input type="radio" name="orderBy" id="orderByName" value="name">
+            <label for="orderByName"> Bank Name </label>
+
+            <input type="radio" name="orderBy" id="orderByType" value="type">
+            <label for="orderByType"> Bank Type </label>
+
+            <input type="radio" name="orderBy" id="orderByUser" value="deptID">
+            <label for="orderByUser"> Departmant ID </label>
             
-            
-        </div>
-        <div>
-            
-        </div>
+            <input type="submit" value="Search!" name="submit" >
+        </form>
+        <form action = "reset.php" method = "post">
+                Clear Cart <input type= "Submit">
+        </form>
 
         <hr>
         <main>
-        <?=displayBanks()?>
+        <?php
+        displayBanks()
+        ?>
         </main>
         <div id="right">
             <h2> Your Cart </h2>
