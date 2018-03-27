@@ -6,9 +6,9 @@ $conn = getDatabaseConnection("groupProject");
 
 function getBankTypes() {
     global $conn;
-    $sql = "SELECT bankType
-            FROM `department`
-            ORDER BY bankType";
+    $sql = "SELECT bankName
+            FROM `bank`
+            ORDER BY bankName";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     $records = $stmt->fetchALL(PDO::FETCH_ASSOC);
@@ -16,87 +16,119 @@ function getBankTypes() {
     //print_r $records;
     
     foreach ($records as $record) {
-        echo "<option> "  . $record['bankType'] . "</option>";
+        echo "<option> "  . $record['bankName'] . "</option>";
     }
 }
 
 function displayBanks(){
     global $conn;
-    $sql = "SELECT * FROM department WHERE 1";
+    
+    $sql = "SELECT * FROM user JOIN department JOIN bank JOIN BankManager
+            ON user.departmentId = department.departmentId AND department.bankType =
+            bank.bankId AND BankManager.bankId = bank.bankId
+            WHERE 1";
+            
     if (isset($_GET['submit'])){
+        
          $namedParameters = array();
-         if (!empty($_GET['departmentId'])) {
-            $sql .= " AND departmentId = :deptId"; //using named parameters
-            $namedParameters[':deptId'] = "%" . $_GET['departmentId'] . "%";  
-         }
-         if (!empty($_GET['deptName'])) {
-            //The following query allows SQL injection due to the single quotes
-            //$sql .= " AND bankType LIKE '%" . $_GET['bankType'] . "%'";
-            $sql .= " AND deptName LIKE :deptName"; //using named parameters
-            $namedParameters[':deptName'] = "%" . $_GET['deptName'] . "%";
-         }
-    }
-         if (!empty($_GET['bankType'])) {
-            //The following query allows SQL injection due to the single quotes
-            //$sql .= " AND bankType LIKE '%" . $_GET['bankType'] . "%'";
-            $sql .= " AND bankType = :dType"; //using named parameters
-            $namedParameters[':dType'] =   $_GET['bankType'] ;
+         
+        if (!empty($_GET['searchBar'])) {
+            $sql .= " AND department.deptName LIKE :deptName"; //using named parameters
+            $namedParameters[':deptName'] = "%" . $_GET['searchBar'] . "%";
+            echo $_GET['searchBar'] ;
          }
          
-        //  if (isset($_GET['available'])) {
-        //      echo $_GET['status'];
-        //      $sql .= " AND status = :status";
-        //      $namedParameters[':status'] =  $_GET['available'];
-        //  }
-          if(isset($_GET['orderBy']) && $_GET['orderBy'] == 'ID'){
-                  $sql .= " ORDER BY departmentId";
+         if (!empty($_GET['searchBar'])){
+             $sql .= " AND user.firstName LIKE :firstName";
+             $namedParameters[':firstName'] = "%" . $_GET['searchBar'] . "%";
          }
-         if(isset($_GET['orderBy']) && $_GET['orderBy'] == 'name')     {
+         
+        if (!empty($_GET['searchBar'])) {
+            $sql .= " AND user.lastName LIKE :lastName"; //using named parameters
+            $namedParameters[':lastName'] = "%" . $_GET['searchBar'] . "%";
+         }
+         
+         if (!empty($_GET['searchBar'])) {
+            $sql .= " AND bank.bankName LIKE :bankName"; //using named parameters
+            $namedParameters[':bankName'] = "%" . $_GET['searchBar']. "%" ;
+         }
+         
+         if (!empty($_GET['bankName'])) {
+            $sql .= " AND bank.bankName LIKE :dType"; //using named parameters      <<
+            $namedParameters[':dType'] =  $_GET['bankName'] ;
+         }
+         
+        
+         
+        if(isset($_GET['orderBy']) && $_GET['orderBy'] == 'id'){
+                  $sql .= " ORDER BY userId";
+        }
+        
+        if(isset($_GET['orderBy']) && $_GET['orderBy'] == 'name')     {
+                  $sql .= " ORDER BY bankName";
+        } 
+        
+         if(isset($_GET['orderBy']) && $_GET['orderBy'] == 'type')     {
                   $sql .= " ORDER BY deptName";
         } 
-         if(isset($_GET['orderBy']) && $_GET['orderBy'] == 'type')     {
-                  $sql .= " ORDER BY bankType";
-        } 
-    //endIf (isset)
+        
+    }
     
-    //   else  {
-    //     $sql .= " ORDER BY bankType";
-    // }
-     //echo "<br/>". $sql;
-    //If user types a bankType
-     //   "AND bankType LIKE '%$_GET['bankType']%'";
-    //if user selects bank type
-      //  "AND bankType = '$_GET['bankType']";
     $stmt = $conn->prepare($sql);
     $stmt->execute($namedParameters);
+    
     $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
+    
+    // var_dump($records);
      foreach ($records as $record) {
-        echo  "<p><b>bank Name: </b> ".$record['bankType'] . " <br/><b>Id:</b> " .
-              $record['departmentId'] .  "  <b>Status:</b> " . $record['bankType'] .
-             "</p><a target='' href='addCart.php?addCart=".$record['departmentId']."'> Add to cart </a><br />";
+        echo  "<p><b>Account Number: </b> ".$record['userId']. ",<b> Member Name: </b>". $record['firstName']. " " . $record['lastName']. "<p><b>Bank: </b> ".$record['bankName'] . " <br/><b>Bank Manager:</b> " .
+              $record['ManagerFirstName'] . " ". $record['ManagerLastName']. " <br/> <b>Account Type:</b> " . $record['deptName'] .
+             "</p><a target='' href='addCart.php?addCart=".$record['userId']."'> Add to cart </a><br />";
             
      }
+     
     
 }
 
 function showCart(){
     global $conn;
-    $sql = "SELECT * FROM department WHERE 1";
-    
+      // var_dump($record);
     
     if(isset($_SESSION['cart'])){
          echo "<table class= 'table table-hover' border = '1'>
-                    <tr>
-                        <th>Member</th>
-                        <th>Account type</th>
-                    </tr>";
+            <tr>
+                <th>Member</th>
+                <th>Account type</th>
+                <th>Bank</th>
+                <th>Email</th>
+            </tr>";
         //var_dump($_SESSION['cart']);
         foreach($_SESSION['cart'] as $elements){
-                echo "<tr>";
-                echo "<td>" . $elements , "</td>" ;
-                echo "<tr>";
+            $namedParameter = array(":id" => $elements);
+            
+             $sql = "SELECT * FROM user JOIN department JOIN bank
+                    ON user.departmentId = department.departmentId AND department.bankType = bank.bankId
+                    WHERE user.userId = :id";
+                    
+                
+            $stmt = $conn->prepare($sql);
+            $stmt->execute($namedParameter);
+            
+            $record = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            foreach($record as $r){
+            echo "<tr>";
+            echo "<td>" . $r['firstName'] . " ".  $r['lastName'] . "</td>" ;
+            
+            echo "<td>" . $r['deptName'] . " </td>";
+            echo "<td>" . $r['bankName'] . " </td>";
+            echo "<td>" . $r['email'] . " </td>";
+            echo "</tr>";
+            }
         }
+        
+      //var_dump($record);
      }
 }
 
@@ -118,9 +150,9 @@ function showCart(){
             <div >
 
         <form>
-            Bank: <input type="text" name="bankType" placeholder="Bank Name"/>
+            Search: <input type="text" name="searchBar" placeholder="Search" />
             Type:
-            <select name="bankType" id ="department">
+            <select name="bankName" id ="department">
                 <option value="">Select One</option>
                 <?php
                     getBankTypes()
@@ -138,13 +170,13 @@ function showCart(){
             <input type="radio" name="orderBy" id="orderByType" value="type">
             <label for="orderByType"> Bank Type </label>
 
-            <input type="radio" name="orderBy" id="orderByUser" value="deptID">
-            <label for="orderByUser"> Departmant ID </label>
+            <input type="radio" name="orderBy" id="orderByUser" value="id">
+            <label for="orderByUser"> Account Nubmer </label>
             
-            <input type="submit" value="Search!" name="submit" >
+            <input type="submit" value="Search" name="submit" >
         </form>
         <form action = "reset.php" method = "post">
-                Clear Cart <input type= "Submit">
+                Clear Choosen Accounts <input type= "Submit">
         </form>
 
         <hr>
@@ -154,11 +186,12 @@ function showCart(){
         ?>
         </main>
         <div id="right">
-            <h2> Your Cart </h2>
+            <h2> Choosen Accounts </h2>
             <br>
             <!-- <iframe name="Banks" height="600" allowtransparency="true"></iframe> -->
              <?php
                 showCart();
+                
             ?>
         </div>
 
